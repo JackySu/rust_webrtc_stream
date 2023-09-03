@@ -1,0 +1,17 @@
+[package]
+name = "webrtc_stream_server"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+axum = { version = "0.6.18", features = ["ws", "json", "headers", "http2"] }
+tokio = { version = "1.28", features = ["full"] }
+futures-util = { default-features = false, version = "0.3.28" }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing = { version = "0.1.37", features = ["attributes"] }
+serde = { version = "1.0.164", features = ["derive"] }
+serde_json = "1"
+http = "0.2.9"
+anyhow = "1.0.71"
