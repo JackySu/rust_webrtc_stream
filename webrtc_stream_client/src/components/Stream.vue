@@ -3,40 +3,7 @@ import { ref, reactive, onBeforeMount } from "vue";
 // import { handleKeyboardEvent, handleMouseEvent } from "../common/InputEvent";
 import { v4 as uuidv4 } from "uuid";
 
-enum MouseStatus {
-    MOUSE_DOWN = "mouse-down",
-    MOUSE_UP = "mouse-up",
-    MOUSE_MOVE = "mouse-move",
-    RIGHT_CLICK = "right-click",
-}
-
-enum WheelStatus {
-    WHEEL_UP = "wheel-up",
-    WHEEL_DOWN = "wheel-down",
-}
-
-enum KeyboardStatus {
-    MOUSE_DOWN = "key-down",
-    MOUSE_UP = "key-up",
-}
-
-enum MessageType {
-    VIDEO_OFFER = "video-offer",
-    VIDEO_ANSWER = "video-answer",
-    NEW_ICE_CANDIDATE = "new-ice-candidate",
-    REMOTE_DESKTOP = "remote-desktop",
-    CLOSE_REMOTE_DESKTOP = "close-remote-desktop",
-}
-
-enum InputEventType {
-    MOUSE_EVENT = "mouse-event",
-    KEY_EVENT = "key-event",
-}
-
-enum Command {
-    MOUSE_EVENT = "mouse_event",
-    KEY_EVENT = "key_event",
-}
+import { MouseStatus, WheelStatus, KeyboardStatus, MessageType, InputEventType, Command } from "@/common/Constant";
 
 
 const data = reactive({
@@ -67,7 +34,7 @@ onBeforeMount(async () => {
 
 // websocket
 const initWebSocket = () => {
-  ws = new WebSocket(`ws://localhost:3536/${data.account.id}`);
+  ws = new WebSocket(`wss://iulx0.top/signal/${data.account.id}`);
 
   ws.onopen = (e: Event) => {
     setInterval(() => {
@@ -102,7 +69,7 @@ const initWebSocket = () => {
   };
 
   ws.onerror = (e: Event) => {
-    console.log("conn error");
+    console.log(e);
   };
 };
 
@@ -147,7 +114,7 @@ const handleRemoteDesktopRequest = async (msg: Record<string, any>) => {
   // get local desktop
   webcamStream = await navigator.mediaDevices.getDisplayMedia({
     video: true,
-    audio: false,
+    audio: true,
   });
 
   webcamStream.getTracks().forEach((track: MediaStreamTrack) =>
@@ -422,7 +389,7 @@ const sendToClient = (msg: Record<string, any>) => {
   </div>
   <div class="form">
     <input v-model="data.receiverAccount.id" type="text" placeholder="请输入对方id" />
-    <button @click="remoteDesktop()">发起远程</button>
+    <button @click="remoteDesktop()">共享屏幕</button>
   </div>
   <video v-show="data.isShowRemoteDesktop" @mousedown="mouseDown($event)" @mouseup="mouseUp($event)"
     @mousemove="mouseMove($event)" @wheel="wheel($event)" @contextmenu.prevent="rightClick($event)" class="desktop"
