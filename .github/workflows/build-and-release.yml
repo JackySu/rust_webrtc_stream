@@ -47,7 +47,7 @@ jobs:
             webrtc_stream_server/target/release/webrtc_stream_server
             webrtc_stream_client/dist/
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          name: Release ${{ github.ref }}
           draft: false
           prerelease: false
         env:
