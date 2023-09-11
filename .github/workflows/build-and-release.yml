@@ -25,13 +25,10 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: svenstaro/upload-release-action@v2
         with:
-          files: webrtc_stream_server/target/release/webrtc_stream_server
-          tag_name: ${{ github.ref }}
-          name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: webrtc_stream_server/target/release/webrtc_stream_server
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
