@@ -13,9 +13,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Navigate to Client Project Directory
-        run: cd webrtc_stream_client
-
       - name: Install Node.js
         uses: actions/setup-node@v2
         with:
@@ -26,12 +23,11 @@ jobs:
 
       - name: Install Dependencies
         run: pnpm install
+        working-directory: ./webrtc_stream_client
 
       - name: Build Client
         run: pnpm build
-
-      - name: Navigate to Rust Project Directory
-        run: cd ../webrtc_stream_server
+        working-directory: ./webrtc_stream_client
 
       - name: Set Up Rust
         uses: actions-rs/toolchain@v1
@@ -41,6 +37,7 @@ jobs:
 
       - name: Build Rust Project
         run: cargo build --release
+        working-directory: ./webrtc_stream_server
 
       - name: Create Release
         id: create_release
