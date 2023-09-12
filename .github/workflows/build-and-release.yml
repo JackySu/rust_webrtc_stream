@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    permissions: read-all
     runs-on: ubuntu-latest
 
     steps:
@@ -28,8 +29,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/release/webrtc_stream_server
+          file: webrtc_stream_server/target/release/webrtc_stream_server
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true
-        working-directory: ./webrtc_stream_server
