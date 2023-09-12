@@ -1,6 +1,6 @@
-use crate::AppState;
+use crate::{AppState, auth::JwtWsUserExtractor, api::api_response::ApiError};
 
-use axum::{extract::{ws::{WebSocket, Message}, WebSocketUpgrade, Path, State}, response::Response};
+use axum::{extract::{ws::{WebSocket, Message}, WebSocketUpgrade, Path, State}, response::{Response, IntoResponse}};
 use tokio::sync::mpsc;
 use futures_util::{StreamExt, SinkExt};
 use tracing::{error, info, warn};
@@ -13,7 +13,10 @@ pub struct MessageData {
     pub msg: String,
 }
 
-pub async fn ws_handler(ws: WebSocketUpgrade, State(state): State<AppState>, Path(uuid): Path<String>) -> Response {
+pub async fn ws_handler(JwtWsUserExtractor(token): JwtWsUserExtractor, ws: WebSocketUpgrade, State(state): State<AppState>, Path(uuid): Path<String>) -> Response {
+    if token.uid != uuid {
+        return ApiError::Unauthorized.into_response();
+    }
     ws.on_upgrade(|socket| handle_socket(socket, state, uuid))
 }
 

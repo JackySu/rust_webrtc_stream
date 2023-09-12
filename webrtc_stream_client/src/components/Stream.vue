@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref, reactive, onBeforeMount } from "vue";
+import { ref, reactive, onBeforeMount, getCurrentInstance } from "vue";
 // import { handleKeyboardEvent, handleMouseEvent } from "../common/InputEvent";
 import { v4 as uuidv4 } from "uuid";
+import { useCookies } from 'vue3-cookies';
 
 import { MouseStatus, WheelStatus, KeyboardStatus, MessageType, InputEventType, Command } from "@/common/Constant";
 
+const { cookies } = useCookies();
 
 const data = reactive({
   account: {
@@ -27,14 +29,31 @@ let remoteDesktopDpi: Record<string, any>;
 
 onBeforeMount(async () => {
   data.account.id = uuidv4();
-  initWebSocket();
+  const resp = await fetch("http://127.0.0.1:3536/auth", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: data.account.id,
+    }),
+  });
+  const res = await resp.json();
+  console.log(res);
+  if (res.auth_token) {
+    cookies.set("auth_token", res.auth_token);
+    initWebSocket();
+  } else {
+    console.log("auth failed");
+  }
 });
 
 /********************************* connect *************************************/
 
 // websocket
 const initWebSocket = () => {
-  ws = new WebSocket(`wss://iulx0.top/signal/${data.account.id}`);
+  const token = cookies.get('auth_token');
+  ws = new WebSocket(`ws://127.0.0.1:3536/${data.account.id}?token=${token}`);
 
   ws.onopen = (e: Event) => {
     setInterval(() => {
@@ -389,7 +408,7 @@ const sendToClient = (msg: Record<string, any>) => {
   </div>
   <div class="form">
     <input v-model="data.receiverAccount.id" type="text" placeholder="请输入对方id" />
-    <button @click="remoteDesktop()">共享屏幕</button>
+    <button @click="remoteDesktop()">请求共享</button>
   </div>
   <video v-show="data.isShowRemoteDesktop" @mousedown="mouseDown($event)" @mouseup="mouseUp($event)"
     @mousemove="mouseMove($event)" @wheel="wheel($event)" @contextmenu.prevent="rightClick($event)" class="desktop"
