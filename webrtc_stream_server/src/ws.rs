@@ -13,11 +13,11 @@ pub struct MessageData {
     pub msg: String,
 }
 
-pub async fn ws_handler(JwtWsUserExtractor(token): JwtWsUserExtractor, ws: WebSocketUpgrade, State(state): State<AppState>, Path(uuid): Path<String>) -> Response {
+pub async fn ws_handler(JwtWsUserExtractor(token): JwtWsUserExtractor, ws: WebSocketUpgrade, State(state): State<AppState>, Path(uuid): Path<String>) -> Result<impl IntoResponse, ApiError> {
     if token.uid != uuid {
-        return ApiError::Unauthorized.into_response();
+        return Err(ApiError::Unauthorized);
     }
-    ws.on_upgrade(|socket| handle_socket(socket, state, uuid))
+    Ok(ws.on_upgrade(|socket| handle_socket(socket, state, uuid)))
 }
 
 async fn handle_socket(socket: WebSocket, state: AppState, uuid: String) {

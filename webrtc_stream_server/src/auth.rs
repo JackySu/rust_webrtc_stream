@@ -88,7 +88,10 @@ pub struct AuthResponse {
 pub async fn auth_handler(State(_state): State<AppState>, Json(user): Json<User>) -> impl IntoResponse {
     let token = match AuthorizationToken::from(user).encode(&JWT_SECRET) {
         Ok(v) => v,
-        Err(_) => return ApiError::TokenGenerationError.into_response(),
+        Err(_) => { return Err(ApiError::TokenGenerationError); }
     };
-    (StatusCode::OK, Json(AuthResponse { auth_token: token })).into_response()
+    Ok((
+        StatusCode::OK, 
+        Json(AuthResponse { auth_token: token })
+    ))
 }
